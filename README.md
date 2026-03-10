@@ -6,7 +6,7 @@ USBShield protects your Windows system from unauthorized USB devices.
 - Writes **warning logs** to Event Viewer  
 - **Portable** software  
 
-| Comparison item        | USBShield | Endpoint Protector | DeviceLock | ManageEngine Device Control Plus | GiliSoft USB Lock |
+| Comparison        | USBShield | Endpoint Protector | DeviceLock | ManageEngine Device Control | GiliSoft USB Lock |
 |------------------------|-----------|--------------------|-----------|----------------------------------|-------------------|
 | Paid / Free            | **Free**      | Paid  | Paid | Paid          | Paid |
 | Open source            | **Yes**       | No                 | No        | No                               | No                |
