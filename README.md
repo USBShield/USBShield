@@ -11,7 +11,7 @@ USBShield protects your Windows system from unauthorized USB devices.
 | Paid / Free            | **Free**      | Paid  | Paid | Paid          | Paid |
 | Open source            | **Yes**       | No                 | No        | No                               | No                |
 | Can block USB devices  | **Yes**       | Yes                | Yes       | Yes                              | Yes               |
-| Can log events         | **Yes**       | Yes                | Yes       | Yes                              | Limited / Yes*    |
+| Can log events         | **Yes**       | Yes                | Yes       | Yes                              | Limited    |
 
 ----
 
