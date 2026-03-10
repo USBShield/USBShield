@@ -8,7 +8,7 @@ USBShield protects your Windows system from unauthorized USB devices.
 
 ----
 
-| Image | Details |
+| - | - |
 | -- | -- |
 | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/1.jpg) | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/2.jpg) |
 | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/3.jpg) | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/4.jpg) |
