@@ -27,19 +27,21 @@ USBShield protects your Windows system from unauthorized USB devices.
 4. Run `usbshield.exe list-devices` to display currently connected devices and see how USBShield will respond.  
 5. Run `usbshield.exe watch` in an **elevated** (administrator) Command Prompt to start monitoring.  
 
-## Rules
-- The default policy is: **deny any device not listed in `rules.conf`.**  
-- By default, `allow input` is included - you can remove it for stricter protection (recommended).
-- `allow input` allows input devices (such as keyboards or mice) even if they are not listed in `rules.conf`.  
-- Use `#` to add comments.  
-- It is recommended to review your rules with `usbshield.exe list-devices` before starting `usbshield.exe watch`.  
+## Rules / Format
+- The default policy is: **deny any device not listed in `rules.conf`.** (except HUBs, which are allowed to prevent accidental blocking)
+- By default, `allow input` is included - you can remove it for stricter protection.
+  - `allow input` allows _input_ devices (such as keyboards or mice) even if they are not listed in `rules.conf`.
+- Syntax: `allow {USBID}`
+- Use `#` to add comments.
+- **It is recommended to review your rules** with `usbshield.exe list-devices` _before_ starting `usbshield.exe watch`.  
 
 ## When Mistake Happens
 - When USBShield takes an action, it logs the event in Event Viewer.  
-- To allow a previously disabled USB device:  
+- To allow a previously disabled USB device:
+  0. Stop USBShield (because it will disable device again)
   1. Open **Device Manager** (`devmgmt.msc`).  
   2. Find the disabled USB device and enable it.  
   3. (Optional) Update your `rules.conf` by running `usbshield.exe generate-rules` again or by editing it manually.  
 
 ## Optional: Register as a Service
-Use NSSM to register USBShield as a service, allowing it to monitor your computer in the background.
+Use NSSM (or anything) to register USBShield as a service, allowing it to monitor your computer in the background.
