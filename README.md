@@ -53,4 +53,11 @@ USBShield protects your Windows system from unauthorized USB devices.
 
 
 ## Optional: Register as a Service
-Use NSSM (or anything) to register USBShield as a service, allowing it to monitor your computer in the background.
+- Use `usbshield.exe service install` to register USBShield as a service, allowing it to monitor your computer in the background.
+Other commands:
+```
+service install     Install the USBShield service
+service uninstall   Uninstall the USBShield service
+service start       Start the USBShield service
+service stop        Stop the USBShield service
+```
