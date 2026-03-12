@@ -1,6 +1,7 @@
 #include "UsbDevice.h"
 #include "RuleEngine.h"
 #include "EventLogger.h"
+#include "ServiceManager.h"
 
 #include <iostream>
 #include <fstream>
@@ -67,11 +68,18 @@ void disableDevice(const std::string& instanceId)
     CloseHandle(pi.hThread);
 }
 
-void showHelp()
-{
-    std::cout << "usbshield generate-rules\n";
-    std::cout << "usbshield list-devices\n";
-    std::cout << "usbshield watch\n";
+void showHelp() {
+    std::cout << "USBShield\n";
+    std::cout << "Usage:\n";
+    std::cout << "  usbshield <command>\n\n";
+    std::cout << "Commands:\n";
+    std::cout << "  generate-rules      Generate a rule set based on currently connected USB devices\n";
+    std::cout << "  list-devices        List currently connected USB devices\n";
+    std::cout << "  watch               Monitor USB device events in real time\n";
+    std::cout << "  service install     Install the USBShield service\n";
+    std::cout << "  service uninstall   Uninstall the USBShield service\n";
+    std::cout << "  service start       Start the USBShield service\n";
+    std::cout << "  service stop        Stop the USBShield service\n";
 }
 
 void generateRule()
@@ -157,7 +165,7 @@ void watch()
 {
     if(!isAdmin())
     {
-        std::cout << "admin is needed\n";
+        std::cout << "Administrator is needed\n";
         return;
     }
 
@@ -167,12 +175,17 @@ void watch()
         return;
     }
 
+    SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+
     auto rules = loadRules(getRulesPath().string());
 
     std::map<std::string,std::string> knownDevices;
     std::cout << "Watching...\n";
 
-    while(true)
+    extern bool serviceRunning;
+    extern bool runningAsService;
+
+    while(!runningAsService || serviceRunning)
     {
         auto devices = listUsbDevices();
 
@@ -226,6 +239,18 @@ void watch()
 
 int main(int argc,char* argv[])
 {
+    if (argc >= 2 && std::string(argv[1]) == "service-run")
+    {
+        SERVICE_TABLE_ENTRYA table[] =
+        {
+            { (LPSTR)"USBShield", ServiceMain },
+            { NULL, NULL }
+        };
+
+        StartServiceCtrlDispatcherA(table);
+        return 0;
+    }
+
     if(argc < 2)
     {
         showHelp();
@@ -240,6 +265,33 @@ int main(int argc,char* argv[])
         listDevices();
     else if(cmd == "watch")
         watch();
+    else if(cmd == "service")
+    {
+        if(!isAdmin())
+        {
+            std::cout << "Administrator rights required.\n";
+            return 0;
+        }
+
+        if(argc < 3)
+        {
+            std::cout << "usbshield service install|uninstall|start|stop\n";
+            return 0;
+        }
+
+        std::string sub = argv[2];
+
+        if(sub == "install")
+            installService();
+        else if(sub == "uninstall")
+            uninstallService();
+        else if(sub == "start")
+            startService();
+        else if(sub == "stop")
+            stopService();
+        else
+            std::cout << "Unknown service command\n";
+    }
     else
         showHelp();
 
