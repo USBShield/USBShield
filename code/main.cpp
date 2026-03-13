@@ -12,7 +12,10 @@
 #include <set>
 
 #include <windows.h>
-#include <shellapi.h>
+
+#include <setupapi.h>
+#include <cfgmgr32.h>
+#include <initguid.h>
 
 std::filesystem::path getExeDirectory()
 {
@@ -28,44 +31,64 @@ std::filesystem::path getRulesPath()
     return getExeDirectory() / "rules.conf";
 }
 
-std::filesystem::path getUSBDeviewPath()
-{
-    return getExeDirectory() / "USBDeview.exe";
-}
-
-bool usbDeviewExists()
-{
-    return std::filesystem::exists(getUSBDeviewPath());
-}
-
 void disableDevice(const std::string& instanceId)
 {
-    std::string exe = getUSBDeviewPath().string();
+    HDEVINFO devInfo = SetupDiCreateDeviceInfoList(NULL, NULL);
 
-    std::string cmd =
-        "\"" + exe + "\" /disable \"" +
-        instanceId + "\"";
+    if (devInfo == INVALID_HANDLE_VALUE)
+    {
+        std::cout << "Failed to create device list\n";
+        return;
+    }
 
-    STARTUPINFOA si{};
-    PROCESS_INFORMATION pi{};
+    SP_DEVINFO_DATA devData{};
+    devData.cbSize = sizeof(devData);
 
-    si.cb = sizeof(si);
+    if (!SetupDiOpenDeviceInfoA(
+            devInfo,
+            instanceId.c_str(),
+            NULL,
+            0,
+            &devData))
+    {
+        std::cout << "Failed to open device\n";
+        SetupDiDestroyDeviceInfoList(devInfo);
+        return;
+    }
 
-    CreateProcessA(
-        NULL,
-        cmd.data(),
-        NULL,
-        NULL,
-        FALSE,
-        CREATE_NO_WINDOW,
-        NULL,
-        NULL,
-        &si,
-        &pi
-    );
+    SP_PROPCHANGE_PARAMS params{};
+    params.ClassInstallHeader.cbSize = sizeof(SP_CLASSINSTALL_HEADER);
+    params.ClassInstallHeader.InstallFunction = DIF_PROPERTYCHANGE;
 
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
+    params.StateChange = DICS_DISABLE;
+    params.Scope = DICS_FLAG_GLOBAL;
+    params.HwProfile = 0;
+
+    if (!SetupDiSetClassInstallParams(
+            devInfo,
+            &devData,
+            (SP_CLASSINSTALL_HEADER*)&params,
+            sizeof(params)))
+    {
+        std::cout << "Failed to set install parameters\n";
+        SetupDiDestroyDeviceInfoList(devInfo);
+        return;
+    }
+
+    if (!SetupDiCallClassInstaller(
+            DIF_PROPERTYCHANGE,
+            devInfo,
+            &devData))
+    {
+        DWORD err = GetLastError();
+        std::cout << "Disable failed. Error: " << err << "\n";
+        SetupDiDestroyDeviceInfoList(devInfo);
+        return;
+    }
+
+    CM_Reenumerate_DevNode(devData.DevInst, CM_REENUMERATE_SYNCHRONOUS);
+
+    SetupDiDestroyDeviceInfoList(devInfo);
 }
 
 void showHelp() {
@@ -166,12 +189,6 @@ void watch()
     if(!isAdmin())
     {
         std::cout << "Administrator is needed\n";
-        return;
-    }
-
-    if(!usbDeviewExists())
-    {
-        std::cout << "USBDeview.exe is not found!\n";
         return;
     }
 
