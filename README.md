@@ -33,11 +33,20 @@ USBShield protects your Windows system from unauthorized USB devices.
 
 ## Rules / Format
 - The default policy is: **deny any device not listed in `rules.conf`.** (except HUBs, which are allowed to prevent accidental blocking)
-- By default, `allow input` is included - you can remove it for stricter protection.
-  - `allow input` allows _input_ devices (such as keyboards or mice) even if they are not listed in `rules.conf`.
+- By default, `allow input` and `allow connected` are included in generated config file - you can remove them for _stricter_ protection.
 - Syntax: `allow {USBID}`
 - Use `#` to add comments.
 - **It is recommended to review your rules** with `usbshield.exe list-devices` _before_ starting `usbshield.exe watch`.  
+
+Special rules:
+- `allow input`
+  - Allows _input_ devices (such as keyboards or mice) even if they are not listed in `rules.conf`.
+- `allow connected`
+  - Allows currently connected devices even if they are not listed in `rules.conf`.
+  - When USBShield detects a device that is not listed in `rules.conf`, it will display a warning message and log it in the Event Viewer.
+
+For Those who want strict rules:
+- Removing "allow connected" is recommended. Just remember to run `usbshield.exe list-devices` to ensure your rules are correct.
 
 
 ## When Mistake Happens
