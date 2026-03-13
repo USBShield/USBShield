@@ -10,3 +10,5 @@ bool evaluateDevice(
     const UsbDevice& device,
     const std::vector<std::string>& rules
 );
+
+bool hasAllowConnected(const std::vector<std::string>& rules);

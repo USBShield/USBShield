@@ -2,3 +2,5 @@
 #include <string>
 
 void logBlockedDevice(const std::string& deviceId, const std::string& deviceName);
+void logAllowedConnected(const std::string& deviceId,
+                         const std::string& deviceName);

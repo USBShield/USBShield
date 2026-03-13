@@ -60,3 +60,12 @@ bool evaluateDevice(
 
     return false;
 }
+
+bool hasAllowConnected(const std::vector<std::string>& rules)
+{
+    for(const auto& r : rules)
+        if(r == "allow connected")
+            return true;
+
+    return false;
+}

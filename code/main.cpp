@@ -56,6 +56,39 @@ void disableDevice(const std::string& instanceId)
         return;
     }
 
+    // -------- SAFETY CHECKS --------
+
+    // 1. Prevent disabling ROOT HUB
+    if(instanceId.find("ROOT_HUB") != std::string::npos)
+    {
+        std::cout << "Not Disable: Root hub\n";
+        SetupDiDestroyDeviceInfoList(devInfo);
+        return;
+    }
+
+    // 2. Prevent disabling USB infrastructure classes
+    char cls[256] = {0};
+    if(SetupDiGetDeviceRegistryPropertyA(
+            devInfo,
+            &devData,
+            SPDRP_CLASS,
+            NULL,
+            (PBYTE)cls,
+            sizeof(cls),
+            NULL))
+    {
+        std::string c = cls;
+
+        if(c == "USBHub" || c == "HDC")
+        {
+            SetupDiDestroyDeviceInfoList(devInfo);
+            std::cout << "Not Disable: USB infrastructure\n";
+            return;
+        }
+    }
+
+    // Disable Device
+
     SP_PROPCHANGE_PARAMS params{};
     params.ClassInstallHeader.cbSize = sizeof(SP_CLASSINSTALL_HEADER);
     params.ClassInstallHeader.InstallFunction = DIF_PROPERTYCHANGE;
@@ -133,7 +166,9 @@ void generateRule()
     }
 
     f << "# permit input devices\n";
-    f << "allow input\n\n";
+    f << "allow input\n";
+    f << "# allow currently connected devices\n";
+    f << "allow connected\n\n";
 
     auto devices = listUsbDevices();
 
@@ -151,9 +186,28 @@ void listDevices()
     auto rules = loadRules(getRulesPath().string());
     auto devices = listUsbDevices();
 
+    if(hasAllowConnected(rules))
+    {
+        for(auto& d : devices)
+        {
+            bool allowed = evaluateDevice(d, rules);
+
+            if(!allowed)
+            {
+                std::cout
+                << "Warning: Device is not in rules.conf but allowed anyway. "
+                << d.instanceId << "\n";
+
+                logAllowedConnected(d.instanceId, d.name);
+
+                rules.push_back("allow " + d.instanceId);
+            }
+        }
+    }
+
     for(auto& d : devices)
     {
-        bool allow = evaluateDevice(d,rules);
+        bool allow = evaluateDevice(d, rules);
 
         std::cout
         << (allow ? "[Allow] " : "[Deny] ")
@@ -196,7 +250,29 @@ void watch()
 
     auto rules = loadRules(getRulesPath().string());
 
+    if(hasAllowConnected(rules))
+    {
+        auto devices = listUsbDevices();
+
+        for(auto& d : devices)
+        {
+            bool allowed = evaluateDevice(d, rules);
+
+            if(!allowed)
+            {
+                std::cout
+                << "Warning: Device is not in rules.conf but allowed anyway. "
+                << d.instanceId << "\n";
+
+                logAllowedConnected(d.instanceId, d.name);
+
+                rules.push_back("allow " + d.instanceId);
+            }
+        }
+    }
+
     std::map<std::string,std::string> knownDevices;
+
     std::cout << "Watching...\n";
 
     extern bool serviceRunning;
