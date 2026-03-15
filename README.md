@@ -19,11 +19,21 @@ USBShield protects your Windows system from unauthorized USB devices.
 
 | - | - |
 | -- | -- |
+| ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/gui.jpg) |   |
 | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/1.jpg) | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/2.jpg) |
 | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/3.jpg) | ![](https://raw.githubusercontent.com/USBShield/USBShield/refs/heads/main/image/4.jpg) |
 
 
-## How to Use
+## How to Use (Installer / Easy)
+1. Download `setup.exe` and run the installer.
+2. Open `USBShield`.
+3. **Install** the service.
+
+- You can start or stop USBShield from the UI.
+- If you want to uninstall USBShield, make sure to uninstall the service first.
+
+
+## How to Use (Portable)
 1. Open **Command Prompt** (cmd).  
 2. Run `usbshield.exe generate-rules` to create a `rules.conf` file.  
 3. Open `rules.conf` and edit it if necessary (see *Rules* below).  
