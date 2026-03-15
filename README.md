@@ -38,9 +38,9 @@ USBShield protects your Windows system from unauthorized USB devices.
 2. Run `usbshield.exe generate-rules` to create a `rules.conf` file.  
 3. Open `rules.conf` and edit it if necessary (see *Rules* below).  
 4. Run `usbshield.exe list-devices` to display currently connected devices and see how USBShield will respond.  
-5. Run `usbshield.exe watch` in an **elevated** (administrator) Command Prompt to start monitoring. _or register as a Service_
+5. Run `usbshield.exe watch` in an **elevated** (administrator) Command Prompt to start monitoring.
 
-- Or just use `usbshield_gui.exe`
+- Or just use `usbshield_gui.exe`.
 
 
 ## Rules / Format
