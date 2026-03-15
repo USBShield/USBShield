@@ -11,6 +11,7 @@
 #define ID_INSTALL 103
 #define ID_UNINSTALL 104
 #define ID_LIST 105
+#define ID_EDITRULES 106
 #define ID_TIMER 200
 #define IDI_ICON1 1
 
@@ -461,6 +462,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 MB_ICONERROR);
             PostQuitMessage(0);
         }
+        if (!std::filesystem::exists("rules.conf"))
+        {
+            LogStatus("rules.conf not found, generating rules...");
+            RunCommand("usbshield.exe generate-rules");
+        }
 
         HWND lblService = CreateWindow("STATIC", "Service Control",
             WS_VISIBLE | WS_CHILD,
@@ -497,6 +503,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             380, 50, 110, 30,
             hwnd, (HMENU)ID_LIST, NULL, NULL);
         SendMessage(btnListDev, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+        HWND btnEditRules = CreateWindow("BUTTON", "Edit rules",
+            WS_VISIBLE | WS_CHILD,
+            500, 50, 120, 30,
+            hwnd, (HMENU)ID_EDITRULES, NULL, NULL);
+        SendMessage(btnEditRules, WM_SETFONT, (WPARAM)hFont, TRUE);
 
         HWND lblStatus = CreateWindow("STATIC", "Status",
             WS_VISIBLE | WS_CHILD,
@@ -618,11 +630,35 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case ID_LIST:
         {
             SetWindowText(txtStatus, "");
-
+            if (!std::filesystem::exists("rules.conf"))
+            {
+               LogStatus("rules.conf not found, generating rules...");
+               ExecRead("usbshield.exe generate-rules");
+            }
             std::string output =
                 ExecRead("usbshield.exe list-devices");
 
             AppendText(txtStatus, output);
+        }
+        break;
+        case ID_EDITRULES:
+        {
+            if (!std::filesystem::exists("rules.conf"))
+            {
+                MessageBox(hwnd,
+                    "rules.conf not found",
+                    "USBShield",
+                    MB_ICONERROR);
+                break;
+            }
+            ShellExecute(
+                NULL,
+                "open",
+                "notepad.exe",
+                "rules.conf",
+                NULL,
+                SW_SHOWNORMAL
+            );
         }
         break;
         }
