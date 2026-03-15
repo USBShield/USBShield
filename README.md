@@ -40,6 +40,8 @@ USBShield protects your Windows system from unauthorized USB devices.
 4. Run `usbshield.exe list-devices` to display currently connected devices and see how USBShield will respond.  
 5. Run `usbshield.exe watch` in an **elevated** (administrator) Command Prompt to start monitoring. _or register as a Service_
 
+- Or just use `usbshield_gui.exe`
+
 
 ## Rules / Format
 - The default policy is: **deny any device not listed in `rules.conf`.** (except HUBs, which are allowed to prevent accidental blocking)
